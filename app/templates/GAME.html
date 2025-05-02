@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Gaming Website</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&amp;display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="icon"
+      href="https://storage.googleapis.com/a1aa/image/p4EtM6xayEojNxQiUBRKLZ1XgKjIgoqJJwSfuNBzkOgGfi0TA.jpg"
+      type="image/x-icon"
+    />
+    <style>
+      body {
+        font-family: 'Roboto', sans-serif;
+      }
+
+      .game-card:hover {
+        transform: scale(1.05);
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+      }
+
+      .game-card img {
+        max-width: 100%;
+        height: auto;
+      }
+
+      .game-card-content {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        height: 100%;
+      }
+
+      .game-card-footer {
+        margin-top: auto;
+      }
+    </style>
+  </head>
+  <body class="bg-gray-900 text-white">
+    <header class="bg-gray-800 p-4">
+      <div class="container mx-auto flex justify-between items-center">
+        <div class="flex items-center space-x-4">
+          <img
+            alt="Logo of IQ Games featuring a brain with gears"
+            class="h-10 w-10"
+            height="40"
+            src="https://storage.googleapis.com/a1aa/image/p4EtM6xayEojNxQiUBRKLZ1XgKjIgoqJJwSfuNBzkOgGfi0TA.jpg"
+            width="40"
+          />
+          <div>
+            <h1 class="text-xl md:text-3xl font-bold">IQ Games</h1>
+            <p class="text-gray-400">
+              Challenge your mind with our collection of exciting games!
+            </p>
+          </div>
+        </div>
+        <nav>
+          <ul class="flex space-x-4">
+            <li>
+              <a class="hover:text-gray-400" href="{{ url_for('student_dashboard') }}">
+                <i class="fas fa-home"></i>
+              </a>
+            </li>
+          </ul>
+        </nav>
+      </div>
+    </header>
+
+    <main class="container mx-auto py-8">
+      <section class="mb-8">
+        <h2 class="text-2xl font-bold mb-4">Featured Games</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+
+          <!-- Maths Flashcards -->
+          <div class="game-card bg-gray-800 p-4 rounded-lg transition duration-300">
+            <div class="game-card-content">
+              <a href="{{ url_for('maths_flashcards') }}">
+                <img
+                  alt="Screenshot of Maths Flashcards game interface showing addition and subtraction problems"
+                  class="w-full h-48 object-cover rounded-lg mb-4"
+                  height="200"
+                  src="https://th.bing.com/th/id/OIP.yFNitRPQyF1Vwh6sMKC0MwHaFC?w=1920&h=1308&rs=1&pid=ImgDetMain"
+                  width="300"
+                />
+                <h3 class="text-xl font-bold mb-2">Maths Flashcards</h3>
+                <p class="text-gray-400 mb-4">
+                  Enhance your math skills by solving basic arithmetic problems using flashcards.
+                </p>
+              </a>
+              <div class="game-card-footer">
+                <a
+                  href="{{ url_for('maths_flashcards') }}"
+                  class="block bg-blue-600 text-center text-white py-3 px-6 rounded-lg hover:bg-blue-700 transition duration-300"
+                  >Play Now</a
+                >
+              </div>
+            </div>
+          </div>
+
+          <!-- Word Scramble -->
+          <div class="game-card bg-gray-800 p-4 rounded-lg transition duration-300">
+            <a href="{{ url_for('WORDSCRABLE') }}">
+              <img
+                alt="Screenshot of Word Scramble game interface with scrambled letters"
+                class="w-full h-48 object-cover rounded-lg mb-4"
+                height="200"
+                src="https://is1-ssl.mzstatic.com/image/thumb/Purple116/v4/3e/90/98/3e9098d5-d773-fb71-542f-1c230ab5a06a/AppIcon-1x_U007emarketing-0-10-85-220.png/512x512bb.jpg"
+                width="300"
+              />
+              <h3 class="text-xl font-bold mb-2">Word Scramble</h3>
+              <p class="text-gray-400 mb-4">
+                Unscramble the letters to form a word! Test your brain and challenge yourself to complete more rounds.
+              </p>
+              <a
+                href="{{ url_for('WORDSCRABLE') }}"
+                class="block bg-blue-600 text-center text-white py-3 px-6 rounded-lg hover:bg-blue-700 transition duration-300"
+                >Play Now</a
+              >
+            </a>
+          </div>
+
+        </div>
+      </section>
+    </main>
+
+    <footer class="bg-gray-800 p-4 mt-8">
+      <div class="container mx-auto text-center">
+        <p>© 2024 IQ Games. All rights reserved.</p>
+      </div>
+    </footer>
+  </body>
+</html>

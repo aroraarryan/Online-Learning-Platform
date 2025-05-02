@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Activities</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Arial', sans-serif;
+        }
+
+        .container {
+            max-width: 800px;
+            padding-top: 40px;
+            padding-bottom: 40px;
+        }
+
+        h2 {
+            text-align: center;
+            font-size: 2em;
+            color: #343a40;
+            margin-bottom: 30px;
+        }
+
+        #chart-container {
+            margin: 0 auto;
+            max-width: 400px;
+            padding: 30px;
+            background-color: #ffffff;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            margin-bottom: 30px;
+        }
+
+        .list-group-item {
+            background-color: #fff;
+            border: 1px solid #ddd;
+            font-size: 1.1em;
+            padding: 15px;
+        }
+
+        .btn-primary {
+            width: 100%;
+            font-size: 1.1em;
+            padding: 12px;
+            border-radius: 8px;
+        }
+
+        .btn-primary:hover {
+            background-color: #007bff;
+        }
+
+        /* Style for the "No activities" message */
+        .empty-message {
+            color: #6c757d;
+            font-size: 1.2em;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>My Activities</h2>
+
+        <!-- Chart Section -->
+        <div id="chart-container">
+            <canvas id="activityChart"></canvas>
+        </div>
+
+        <div class="empty-message">
+            <ul class="list-group">
+                <li class="list-group-item">You have no activities recorded.</li>
+            </ul>
+        </div>
+
+        <!-- Back to Dashboard Button -->
+        <a href="{{ url_for('student_dashboard') }}" class="btn btn-primary mt-4">Back to Dashboard</a>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+    <script>
+        const ctx = document.getElementById('activityChart').getContext('2d');
+
+        // Placeholder data for the chart
+        const labels = ['Completed', 'Pending', 'Skipped'];
+        const data = [10, 5, 2];
+
+        // Generate a smaller pie chart
+        new Chart(ctx, {
+            type: 'pie',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Activity Distribution',
+                    data: data,
+                    backgroundColor: [
+                        '#FF6384', '#36A2EB', '#FFCE56'
+                    ],
+                    hoverOffset: 4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                plugins: {
+                    legend: {
+                        position: 'top'
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>

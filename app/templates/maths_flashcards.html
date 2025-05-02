@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Math Flashcards</title>
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      background: 
+        linear-gradient(45deg, rgba(106, 17, 203, 0.7), rgba(37, 117, 252, 0.7)),
+        url('https://wallpapers.com/images/hd/mathematics-colorful-diagrams-with-numbers-snya5mv2dogewetc.jpg');
+      background-size: cover;
+      background-position: center;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      color: #fff;
+      overflow: hidden;
+    }
+
+    .container {
+      background: rgba(255, 255, 255, 0.2);
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+      text-align: center;
+      width: 90%;
+      max-width: 350px;
+      backdrop-filter: blur(10px);
+    }
+
+    #logo {
+      width: 80px;
+      margin-bottom: 15px;
+    }
+
+    #question {
+      font-size: 20px;
+      margin-bottom: 15px;
+    }
+
+    #options {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-around;
+      gap: 10px;
+    }
+
+    .option {
+      background: #ff9800;
+      color: #fff;
+      padding: 8px 15px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 14px;
+      border: none;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+      transition: transform 0.3s, background 0.3s;
+    }
+
+    .option:hover {
+      transform: scale(1.1);
+      background: #e65100;
+    }
+
+    .option.correct {
+      background: #4caf50 !important;
+    }
+
+    .option.wrong {
+      background: #f44336 !important;
+    }
+
+    #timer {
+      font-size: 16px;
+      margin-top: 10px;
+    }
+
+    #result {
+      font-size: 16px;
+      font-weight: bold;
+      margin-top: 10px;
+    }
+
+    button {
+      padding: 10px 20px;
+      font-size: 14px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      background: #03a9f4;
+      color: white;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+      transition: background 0.3s, transform 0.3s;
+    }
+
+    button:hover {
+      background: #0288d1;
+      transform: scale(1.05);
+    }
+
+    button.hidden {
+      display: none;
+    }
+
+    @media (max-height: 600px) {
+      body {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .container {
+        margin: 20px;
+        width: 95%;
+        max-width: 320px;
+      }
+
+      #question {
+        font-size: 18px;
+      }
+
+      .option {
+        font-size: 12px;
+        padding: 8px;
+      }
+
+      button {
+        font-size: 12px;
+        padding: 8px 15px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <img id="logo" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSba9_mV5oBa9cHbV2l4kjUTbxgOjggLrUoMg&s" alt="Logo"> <!-- Add logo here -->
+    <h1>Math Flashcards</h1>
+    <div id="flashcard">
+      <p id="question">What is 5 + 3?</p>
+      <div id="options"></div>
+      <p id="timer">Time Left: <span id="time">10</span>s</p>
+      <p id="result"></p>
+    </div>
+    <button id="next" class="hidden">Next Question</button>
+  </div>
+  <script>
+    // JavaScript remains unchanged
+    const questionElement = document.getElementById('question');
+    const optionsContainer = document.getElementById('options');
+    const timerElement = document.getElementById('time');
+    const resultElement = document.getElementById('result');
+    const nextButton = document.getElementById('next');
+
+    let correctAnswer;
+    let timer;
+    let timeLeft = 10;
+
+    function generateQuestion() {
+      const questionType = ['arithmetic', 'algebra', 'geometry'][Math.floor(Math.random() * 3)];
+
+      switch (questionType) {
+        case 'arithmetic':
+          generateArithmeticQuestion();
+          break;
+        case 'algebra':
+          generateAlgebraQuestion();
+          break;
+        case 'geometry':
+          generateGeometryQuestion();
+          break;
+      }
+
+      nextButton.classList.add('hidden');
+      resultElement.textContent = '';
+    }
+
+    function generateArithmeticQuestion() {
+      const num1 = Math.floor(Math.random() * 20) + 1;
+      const num2 = Math.floor(Math.random() * 20) + 1;
+      const operation = ['+', '-', '*', '/'][Math.floor(Math.random() * 4)];
+
+      switch (operation) {
+        case '+': correctAnswer = num1 + num2; break;
+        case '-': correctAnswer = num1 - num2; break;
+        case '*': correctAnswer = num1 * num2; break;
+        case '/': correctAnswer = (num1 / num2).toFixed(2); break;
+      }
+
+      questionElement.textContent = `What is ${num1} ${operation} ${num2}?`;
+      generateOptions(correctAnswer);
+      resetTimer();
+    }
+
+    function generateAlgebraQuestion() {
+      const a = Math.floor(Math.random() * 10) + 1;
+      const b = Math.floor(Math.random() * 10) + 1;
+      const c = Math.floor(Math.random() * 10) + 1;
+      correctAnswer = (c - b) / a;
+
+      questionElement.textContent = `Solve for x: ${a}x + ${b} = ${c}`;
+      generateOptions(correctAnswer.toFixed(2));
+      resetTimer();
+    }
+
+    function generateGeometryQuestion() {
+      const shape = ['circle', 'rectangle'][Math.floor(Math.random() * 2)];
+      if (shape === 'circle') {
+        const radius = Math.floor(Math.random() * 10) + 1;
+        correctAnswer = Math.PI * radius * radius;
+        questionElement.textContent = `Find the area of a circle with radius ${radius}.`;
+      } else {
+        const length = Math.floor(Math.random() * 10) + 1;
+        const width = Math.floor(Math.random() * 10) + 1;
+        correctAnswer = length * width;
+        questionElement.textContent = `Find the area of a rectangle with length ${length} and width ${width}.`;
+      }
+
+      generateOptions(correctAnswer.toFixed(2));
+      resetTimer();
+    }
+
+    function generateOptions(correctAnswer) {
+      optionsContainer.innerHTML = '';
+      const correctPosition = Math.floor(Math.random() * 4);
+
+      for (let i = 0; i < 4; i++) {
+        const optionButton = document.createElement('button');
+        optionButton.classList.add('option');
+
+        if (i === correctPosition) {
+          optionButton.textContent = correctAnswer;
+        } else {
+          let randomAnswer;
+          do {
+            randomAnswer = (Math.random() * 20 + 1).toFixed(2);
+          } while (randomAnswer == correctAnswer || randomAnswer === '');
+
+          optionButton.textContent = randomAnswer;
+        }
+
+        optionButton.addEventListener('click', () => handleAnswer(optionButton, parseFloat(optionButton.textContent)));
+        optionsContainer.appendChild(optionButton);
+      }
+    }
+
+    function handleAnswer(button, selectedAnswer) {
+      clearInterval(timer);
+
+      if (selectedAnswer === parseFloat(correctAnswer)) {
+        button.classList.add('correct');
+        resultElement.textContent = 'Correct!';
+        resultElement.style.color = 'lightgreen';
+      } else {
+        button.classList.add('wrong');
+        resultElement.textContent = `Wrong! The correct answer was ${correctAnswer}.`;
+        resultElement.style.color = 'pink';
+
+        document.querySelectorAll('.option').forEach(btn => {
+          if (parseFloat(btn.textContent) === parseFloat(correctAnswer)) {
+            btn.classList.add('correct');
+          }
+        });
+      }
+
+      nextButton.classList.remove('hidden');
+    }
+
+    function resetTimer() {
+      clearInterval(timer);
+      timeLeft = 10;
+      timerElement.textContent = timeLeft;
+
+      timer = setInterval(() => {
+        timeLeft--;
+        timerElement.textContent = timeLeft;
+
+        if (timeLeft <= 0) {
+          clearInterval(timer);
+          resultElement.textContent = `Time's up! The correct answer was ${correctAnswer}.`;
+          resultElement.style.color = 'pink';
+
+          document.querySelectorAll('.option').forEach(btn => {
+            if (parseFloat(btn.textContent) === parseFloat(correctAnswer)) {
+              btn.classList.add('correct');
+            }
+          });
+
+          nextButton.classList.remove('hidden');
+        }
+      }, 1000);
+    }
+
+    nextButton.addEventListener('click', generateQuestion);
+
+    generateQuestion();
+  </script>
+</body>
+</html>

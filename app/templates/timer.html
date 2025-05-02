@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Timer with Hours, Minutes, and Seconds</title>
+    <style>
+        :root {
+            --background-color: #001F54; /* Navy Blue */
+            --box-color: #ffffff; /* White */
+            --text-color: #001F54; /* Navy Blue */
+            --button-color: #0056b3; /* Blue */
+            --button-hover: #004080; /* Darker Blue */
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--background-color);
+            color: var(--box-color);
+        }
+
+        /* Timer Button */
+        .timer-button {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background-color: var(--button-color);
+            color: var(--box-color);
+            padding: 8px 16px;
+            border: none;
+            border-radius: 5px;
+            font-size: 0.9em;
+            font-weight: bold;
+            cursor: pointer;
+            z-index: 1000;
+            transition: background-color 0.3s ease;
+        }
+
+        .timer-button:hover {
+            background-color: var(--button-hover);
+        }
+
+        /* Timer Box */
+        .timer-box {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            width: 100px; /* Smaller width */
+            height: 40px; /* Smaller height */
+            background-color: var(--box-color);
+            color: var(--text-color);
+            padding: 5px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            text-align: center;
+            cursor: pointer;
+            z-index: 1000;
+            display: none; /* Hidden initially */
+        }
+
+        .timer-box .message {
+            font-size: 0.7em; /* Reduced font size */
+            font-weight: bold;
+        }
+
+        .timer-box .time {
+            font-size: 0.8em; /* Slightly smaller font size for the timer */
+            font-weight: bold;
+            display: none; /* Hidden initially */
+        }
+
+        /* Pop-up message */
+        .popup-message {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: #ff9800;
+            color: white;
+            font-size: 1.2em;
+            padding: 15px;
+            border-radius: 10px;
+            display: none;
+            z-index: 2000;
+            text-align: center;
+        }
+
+        /* Settings Box */
+        .settings-box {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 300px;
+            background-color: var(--box-color);
+            color: var(--text-color);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            z-index: 1500;
+            display: none; /* Hidden initially */
+            text-align: center;
+        }
+
+        .settings-box h3 {
+            margin: 0 0 15px 0;
+            font-size: 1.2em;
+        }
+
+        .settings-box label {
+            display: block;
+            margin-top: 10px;
+        }
+
+        .settings-box input[type="number"] {
+            width: 100%;
+            padding: 8px;
+            margin: 5px 0;
+            border: 1px solid var(--text-color);
+            border-radius: 5px;
+            text-align: center;
+            font-size: 1em;
+        }
+
+        .settings-box button {
+            width: 100%;
+            padding: 10px;
+            background-color: var(--button-color);
+            color: var(--box-color);
+            border: none;
+            border-radius: 5px;
+            font-size: 1em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .settings-box button:hover {
+            background-color: var(--button-hover);
+        }
+    </style>
+    <script>
+        let timerInterval;
+        let totalTime;
+        let isBreakTime = false;
+        let isTimeVisible = false;
+
+        function showPopupMessage(message) {
+            const popup = document.querySelector('.popup-message');
+            popup.textContent = message;
+            popup.style.display = "block";
+
+            setTimeout(() => {
+                popup.style.display = "none";
+            }, 3000);
+        }
+
+        function updateTimerDisplay(totalSeconds, timerBox) {
+            const timeDisplay = timerBox.querySelector('.time');
+            const hours = Math.floor(totalSeconds / 3600);
+            const minutes = Math.floor((totalSeconds % 3600) / 60);
+            const seconds = totalSeconds % 60;
+
+            timeDisplay.textContent =
+                `${hours < 10 ? '0' : ''}${hours}:` +
+                `${minutes < 10 ? '0' : ''}${minutes}:` +
+                `${seconds < 10 ? '0' : ''}${seconds}`;
+        }
+
+        function toggleTimeVisibility(timerBox) {
+            const timeDisplay = timerBox.querySelector('.time');
+            isTimeVisible = !isTimeVisible;
+            timeDisplay.style.display = isTimeVisible ? "block" : "none";
+        }
+
+        function startTimer(studyMinutes, breakMinutes) {
+            const timerBox = document.querySelector('.timer-box');
+            const messageDisplay = timerBox.querySelector('.message');
+            const timeDisplay = timerBox.querySelector('.time');
+            timerBox.style.display = "block";
+
+            let remainingMinutes = isBreakTime ? breakMinutes : studyMinutes;
+
+            totalTime = remainingMinutes * 60;
+            updateTimerDisplay(totalTime, timerBox);
+
+            if (timerInterval) clearInterval(timerInterval);
+
+            timerInterval = setInterval(() => {
+                totalTime--;
+
+                if (totalTime <= 0) {
+                    clearInterval(timerInterval);
+
+                    if (isBreakTime) {
+                        isBreakTime = false;
+                        showPopupMessage("Back to Study!");
+                        messageDisplay.textContent = "Study Hard!";
+                        timeDisplay.style.display = "none";
+                        startTimer(studyMinutes, breakMinutes);
+                    } else {
+                        isBreakTime = true;
+                        showPopupMessage("Break Time!");
+                        messageDisplay.textContent = "Break Time!";
+                        timeDisplay.style.display = "none";
+                        startTimer(studyMinutes, breakMinutes);
+                    }
+                } else {
+                    updateTimerDisplay(totalTime, timerBox);
+                }
+            }, 1000);
+
+            timerBox.addEventListener('click', () => {
+                toggleTimeVisibility(timerBox);
+            });
+        }
+
+        function showSettingsBox() {
+            const settingsBox = document.querySelector('.settings-box');
+            settingsBox.style.display = "block";
+        }
+
+        function hideSettingsBox() {
+            const settingsBox = document.querySelector('.settings-box');
+            settingsBox.style.display = "none";
+        }
+
+        function setTimer() {
+            const studyInput = parseInt(document.getElementById('studyTime').value, 10) || 0;
+            const breakInput = parseInt(document.getElementById('breakTime').value, 10) || 0;
+
+            if (studyInput <= 0 || breakInput <= 0) {
+                showPopupMessage("Please enter valid times for study and break!");
+                return;
+            }
+
+            hideSettingsBox();
+            startTimer(studyInput, breakInput);
+        }
+    </script>
+</head>
+<body>
+    <!-- Timer Button -->
+    <button class="timer-button" onclick="showSettingsBox()">Set Timer</button>
+
+    <!-- Pop-up Message -->
+    <div class="popup-message"></div>
+
+    <!-- Settings Box -->
+    <div class="settings-box">
+        <h3>Set Timer</h3>
+        <label for="studyTime">Study Time (Minutes):</label>
+        <input type="number" id="studyTime" placeholder="Enter minutes">
+        <label for="breakTime">Break Time (Minutes):</label>
+        <input type="number" id="breakTime" placeholder="Enter minutes">
+        <button onclick="setTimer()">Start Timer</button>
+    </div>
+
+    <!-- Timer Box -->
+    <div class="timer-box">
+        <div class="message">Study Hard!</div>
+        <div class="time"></div>
+    </div>
+</body>
+</html>

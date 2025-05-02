@@ -1,0 +1,144 @@
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <title>Instructor Dashboard</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+  <style>
+    body {
+      font-family: 'Roboto', sans-serif;
+    }
+    /* Ensure smooth scrolling */
+    html {
+      scroll-behavior: smooth;
+    }
+  </style>
+</head>
+<body class="bg-gray-900 text-gray-200">
+  <div class="min-h-screen flex flex-col">
+   <!-- Header -->
+   <header class="bg-gray-800 p-4 flex justify-between items-center">
+    <h1 class="text-2xl font-bold">Instructor Dashboard</h1>
+    <nav>
+     <ul class="flex space-x-4">
+      <li><a class="hover:text-gray-400" href="{{ url_for('get_started') }}">Home</a></li>
+      <li><a class="hover:text-gray-400" href="{{ url_for('home') }}">Logout</a></li>
+     </ul>
+    </nav>
+   </header>
+
+   <!-- Main Content -->
+   <main class="flex-grow container mx-auto p-4">
+    <div class="flex flex-col md:flex-row md:space-x-4">
+     <!-- Profile Sidebar -->
+     <aside class="md:w-1/4 bg-gray-800 p-4 rounded-lg">
+      <div class="text-center">
+       <img alt="Profile picture of the instructor" class="w-32 h-32 rounded-full mx-auto" src="https://t4.ftcdn.net/jpg/08/88/14/81/360_F_888148110_3nqgMlH6ZXadlxPKVXeOC5gigRWXAEjj.jpg" />
+       <h2 class="mt-4 text-xl font-semibold">Educator</h2>
+       <p class="text-gray-400">vvce@Educator.com</p>
+      </div>
+      <ul class="mt-6 space-y-2">
+       <li>
+        <a class="block py-2 px-4 rounded hover:bg-gray-700 active:bg-blue-700" href="#my-courses">
+          <i class="fas fa-book mr-2"></i> My Courses
+        </a>
+       </li>
+       <li>
+        <a class="block py-2 px-4 rounded hover:bg-gray-700" href="#notifications">
+          <i class="fas fa-bell mr-2"></i> Notifications
+        </a>
+       </li>
+       <li>
+        <a class="block py-2 px-4 rounded hover:bg-gray-700" href="#create-assignment">
+          <i class="fas fa-edit mr-2"></i> Create Assignment
+        </a>
+       </li>
+      </ul>
+     </aside>
+
+     <!-- Profile Content -->
+     <section class="md:w-3/4 bg-gray-800 p-4 rounded-lg">
+      <h2 class="text-2xl font-semibold mb-4">Create New Assignment</h2>
+
+      <!-- Assignment Creation Form -->
+      <form action="#" method="POST" class="space-y-4" id="create-assignment">
+        <div>
+          <label for="assignment-title" class="block text-gray-300">Assignment Title</label>
+          <input type="text" id="assignment-title" name="assignment-title" class="w-full p-3 bg-gray-700 rounded-lg text-gray-200" placeholder="Enter assignment title" required/>
+        </div>
+        <div>
+          <label for="assignment-description" class="block text-gray-300">Assignment Description</label>
+          <textarea id="assignment-description" name="assignment-description" class="w-full p-3 bg-gray-700 rounded-lg text-gray-200" placeholder="Enter assignment description" rows="5" required></textarea>
+        </div>
+        <div>
+          <label for="due-date" class="block text-gray-300">Due Date</label>
+          <input type="datetime-local" id="due-date" name="due-date" class="w-full p-3 bg-gray-700 rounded-lg text-gray-200" required/>
+        </div>
+        <div>
+          <button type="submit" class="w-full py-3 px-4 bg-blue-600 rounded-lg text-white hover:bg-blue-500">
+            Create Assignment
+          </button>
+        </div>
+      </form>
+
+      <!-- My Courses Section -->
+      <div id="my-courses" class="mt-10">
+        <h2 class="text-2xl font-semibold mb-4">My Courses</h2>
+        
+        <!-- Course List -->
+        <div class="space-y-4">
+          <!-- Example Course 1 -->
+          <div class="bg-gray-700 p-4 rounded-lg">
+            <h3 class="text-xl font-semibold">Course Title 1</h3>
+            <p class="text-gray-400">This is a description of Course 1.</p>
+          </div>
+
+          <!-- Example Course 2 -->
+          <div class="bg-gray-700 p-4 rounded-lg">
+            <h3 class="text-xl font-semibold">Course Title 2</h3>
+            <p class="text-gray-400">This is a description of Course 2.</p>
+          </div>
+
+          <!-- Example Course 3 -->
+          <div class="bg-gray-700 p-4 rounded-lg">
+            <h3 class="text-xl font-semibold">Course Title 3</h3>
+            <p class="text-gray-400">This is a description of Course 3.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Notifications Section -->
+      <div id="notifications" class="mt-10">
+        <h2 class="text-2xl font-semibold mb-4">Notifications</h2>
+        
+        <!-- Notification List -->
+        <div class="space-y-4">
+          <!-- Example Notification 1 -->
+          <div class="bg-gray-700 p-4 rounded-lg">
+            <p class="text-gray-400">New assignment has been posted for Course 1.</p>
+          </div>
+
+          <!-- Example Notification 2 -->
+          <div class="bg-gray-700 p-4 rounded-lg">
+            <p class="text-gray-400">Course 2 has received new feedback from students.</p>
+          </div>
+
+          <!-- Example Notification 3 -->
+          <div class="bg-gray-700 p-4 rounded-lg">
+            <p class="text-gray-400">Your Course 3 has been approved for the next semester.</p>
+          </div>
+        </div>
+      </div>
+     </section>
+    </div>
+   </main>
+
+   <!-- Footer -->
+   <footer class="bg-gray-800 p-4 text-center">
+    <p>© 2023 Learning Platform. All rights reserved.</p>
+   </footer>
+  </div>
+</body>
+</html>

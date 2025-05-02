@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Student Dashboard - Access your courses and track progress.">
+    <meta name="keywords" content="Student Dashboard, Online Courses, Learning Platform">
+    <meta name="author" content="Your Team Name">
+    <title>Student Dashboard</title>
+
+    <!-- Favicon -->
+    <link rel="icon" href="{{ url_for('static', filename='images/favicon.ico') }}" type="image/x-icon">
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;700&family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Font Awesome for Icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.socket.io/4.0.1/socket.io.min.js"></script>
+
+    <style>
+        /* Global Styles */
+        body {
+            font-family: 'Poppins', sans-serif;
+            margin: 0;
+            padding: 0;
+            background: url('https://e0.pxfuel.com/wallpapers/445/472/desktop-wallpaper-1080-%E2%80%A2-black-and-blue-abstract-backgrounds-12.jpg') no-repeat center center fixed;
+            background-size: cover;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            color: #f4f7fa;
+            animation: moonlightEffect 15s ease infinite;
+        }
+
+        @keyframes moonlightEffect {
+            0% { background-position: 0% 50%; }
+            25% { background-position: 50% 50%; }
+            50% { background-position: 100% 50%; }
+            75% { background-position: 50% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* Sidebar */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: -250px;
+            width: 250px;
+            height: 100%;
+            background-color: #00696c;
+            color: white;
+            padding-top: 30px;
+            transition: left 0.3s;
+            z-index: 1000;
+        }
+
+        .sidebar.open {
+            left: 0;
+        }
+
+        .sidebar h2 {
+            font-size: 1.8em;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .sidebar a {
+            display: block;
+            color: white;
+            padding: 15px;
+            text-decoration: none;
+            border-radius: 5px;
+            margin: 10px 0;
+            transition: background 0.3s, transform 0.3s;
+        }
+
+        .sidebar a:hover {
+            background-color: #1C1C1C;
+            transform: translateX(10px);
+        }
+
+        .sidebar .btn-custom {
+            font-size: 1.2em;
+            background-color: #09ff00;
+            color: white;
+            padding: 12px;
+            border-radius: 5px;
+            text-decoration: none;
+            margin-top: 30px;
+            display: inline-block;
+            transition: background 0.3s;
+        }
+
+        .sidebar .btn-custom:hover {
+            background-color: hsl(183, 100%, 35%);
+            transform: scale(1.05);
+        }
+
+        /* Main content */
+        .main-content {
+            padding: 20px;
+            flex-grow: 1;
+        }
+
+        header {
+            background-color: hsl(209, 72%, 48%);
+            color: #fff;
+            padding: 20px;
+            text-align: center;
+            position: relative;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+        }
+
+    
+        header h1 {
+            font-size: 2.5em;
+            font-weight: 700;
+            animation: rainbowText 3s ease infinite;
+        }
+
+        /* Toggle Button */
+        .toggle-btn {
+            position: absolute;
+            left: 20px;
+            top: 20px;
+            background: none;
+            border: none;
+            color: #fff;
+            font-size: 1.5em;
+            cursor: pointer;
+        }
+
+        .dashboard-header {
+            text-align: center;
+            font-size: 2em;
+            font-weight: 700;
+            margin-top: 20px;
+        }
+
+        /* Option Cards (My Courses, Activity, etc.) */
+        .card {
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            background-color: #333;
+            width: 100%; /* Take full width of the grid item */
+            margin: 10px; /* Remove auto margin, just use grid spacing */
+            position: relative;
+        }
+
+        .card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+        }
+
+        .card-title {
+            font-size: 1.5em;
+            margin-bottom: 15px;
+            color: #fff;
+        }
+
+        .card-body {
+            background-color: hwb(0 27% 73%);
+            padding: 20px;
+            border-radius: 10px;
+        }
+
+        .card-text {
+            font-size: 1.1em;
+            color: #ccc;
+        }
+
+        .icon {
+            font-size: 3em;
+            margin-bottom: 20px;
+            color: #00d1b2;
+            transition: color 0.3s ease, transform 0.3s ease;
+        }
+
+        .icon:hover {
+            color: #ff6347;
+            transform: scale(1.1);
+        }
+
+        .btn-custom {
+            font-size: 1.2em;
+            background-color: hsl(82, 100%, 21%);
+            color: white;
+            padding: 15px;
+            border-radius: 5px;
+            text-decoration: none;
+            margin-top: 30px;
+            display: inline-block;
+            transition: background 0.3s, transform 0.3s;
+        }
+
+        .btn-custom:hover {
+            background-color: #1C1C1C;
+            transform: scale(1.05);
+        }
+
+        footer {
+            background-color: #1C1C1C;
+            color: #fff;
+            text-align: center;
+            padding: 15px;
+            margin-top: 30px;
+            box-shadow: 0 -4px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Flex Layout for Cards */
+        .card-deck {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); /* Increased card size */
+            gap: 20px;
+            justify-content: center;
+        }
+
+        /* Updated Hover Color for Option Cards */
+        .card:hover .card-body {
+            background-color: #0069d9; /* Solid blue background */
+            animation: none; /* Remove animation */
+        }
+        /* Floating Home Icon Styling */
+        .home-icon {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #e31e53, #2a82ba);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.5em;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            z-index: 1000;
+        }
+
+        .home-icon:hover {
+            transform: scale(1.2);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+        }
+        .notification-bell {
+        position: fixed;
+        top: 10px; /* Adjust top position as needed */
+        right: 20px; /* Adjust right position for precise placement */
+        background-color: #f44336; /* Red background for the notification bell */
+        color: white;
+        border-radius: 50%;
+        width: 50px;
+        height: 50px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 1.5em;
+        cursor: pointer;
+        z-index: 1050; /* Ensure it's above other elements */
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+        
+
+        /* Hover effect for the notification bell */
+        .notification-bell:hover {
+        transform: scale(1.1);
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4);
+    }
+    /* Notification list */
+    .notifications-list {
+    position: fixed;
+    top: 60px;
+    right: 20px;
+    width: 250px;
+    background-color: rgba(0, 0, 0, 0.8);
+    color: white;
+    border-radius: 8px;
+    padding: 10px;
+    display: none;
+    z-index: 9999;
+    max-height: 400px;
+    overflow-y: auto;
+    }
+
+    /* Show the notifications list when active */
+    .notifications-list.active {
+    display: block;
+    }
+    .todo-icon {
+    position: fixed;
+    top: 40%;
+    right: 20px; /* Starting position */
+    transform: translateY(-50%);
+    background-color: #28a745;
+    border-radius: 50%;
+    padding: 15px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    cursor: grab; /* Change cursor to indicate it can be moved */
+    transition: all 0.3s ease;
+}
+
+/* Hover effect for TO-DO Icon */
+.todo-icon:hover {
+    background-color: #218838;
+    transform: translateY(-50%) scale(1.1);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
+}
+
+/* Icon size and color */
+.todo-icon i {
+    font-size: 1.5rem; /* Larger icon size */
+    color: white; /* White icon color */
+}
+/* Timer Icon Styling */
+.timer-icon {
+    position: fixed;
+    bottom: 160px; /* Adjust the position so it's not overlapping with other icons */
+    right: 20px;
+    width: 50px;
+    height: 50px;
+    background: linear-gradient(135deg, #ff8c00, #ffbc00); /* Gradient color */
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 1.5em;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    z-index: 1000;
+}
+
+.timer-icon:hover {
+    transform: scale(1.2);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4);
+}
+
+
+    
+
+
+
+    </style>
+</head>
+<body>
+    <!-- Home Icon -->
+    <a href="/" class="home-icon" title="Go to Home">
+        <i>&#8962;</i> <!-- Unicode for home symbol -->
+    </a>
+    <a href="{{ url_for('todolist') }}" class="todo-icon">
+        <i class="fas fa-check-square"></i> <!-- Font Awesome check-box icon -->
+    </a>
+<!-- Timer Icon -->
+<a href="{{ url_for('timer') }}" class="timer-icon" title="Start Timer">
+    <i class="fas fa-clock"></i> <!-- Font Awesome clock icon -->
+</a>
+
+
+    <!-- Sidebar -->
+    <div class="sidebar" id="sidebar">
+        <h2>Student Dashboard</h2>
+        <a href="{{ url_for('contact') }}">Report an Issue</a>
+        <a href="{{ url_for('home') }}">Logout</a>
+        <a href="https://4xsnippet123.flarum.cloud" class="btn-custom">Start a Discussion</a>
+    </div>
+    <!-- Chatbot Icon -->
+<a href="https://cdn.botpress.cloud/webchat/v2.2/shareable.html?configUrl=https://files.bpcontent.cloud/2024/11/30/07/20241130074032-TEYI1HE4.json" class="chatbot-icon" title="Chat with Bot">
+    <i class="fas fa-comments"></i>
+</a>
+
+    <style>
+    .chatbot-icon {
+        position: fixed;
+        bottom: 90px;
+        right: 20px;
+        width: 50px;
+        height: 50px;
+        background: linear-gradient(135deg, #6a11cb, #2575fc);
+        color: white;
+        border-radius: 50%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 1.5em;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        z-index: 1000;
+    }
+
+    .chatbot-icon:hover {
+        transform: scale(1.2);
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4);
+    }
+    </style>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <header>
+            <button class="toggle-btn" id="sidebarToggle">☰</button>
+            <h1>Welcome to Your Dashboard</h1>
+        </header>
+
+        <div class="container mt-4">
+            <div class="dashboard-header">
+                <h2>Welcome, Student!</h2>
+                <p>Manage your courses, track your progress, participate in quizzes, and enhance your IQ!</p>
+            </div>
+
+            <div class="card-deck">
+                <!-- My Courses Card -->
+                <div class="card">
+                    <div class="card-body text-center">
+                        <i class="fas fa-book icon"></i>
+                        <h5 class="card-title">My Courses</h5>
+                        <p class="card-text">View and manage your enrolled courses.</p>
+                        <a href="{{ url_for('my_courses') }}" class="btn-custom">Explore</a>
+                    </div>
+                </div>
+
+                <!-- My Activity Card -->
+                <div class="card">
+                    <div class="card-body text-center">
+                        <i class="fas fa-tasks icon"></i>
+                        <h5 class="card-title">My Activity</h5>
+                        <p class="card-text">Track your completed tasks and ongoing projects.</p>
+                        <a href="{{ url_for('my_activities') }}" class="btn-custom">View</a>
+                    </div>
+                </div>
+
+                <!-- Quiz Card -->
+                <div class="card">
+                    <div class="card-body text-center">
+                        <i class="fas fa-poll-h icon"></i>
+                        <h5 class="card-title">Participate in Quiz</h5>
+                        <p class="card-text">Test your knowledge and challenge yourself.</p>
+                        <a href="{{ url_for('quiz') }}" class="btn-custom" target="_blank">Start Quiz</a> <!-- Replace with your URL -->
+                    </div>
+                </div>
+
+                <!-- Games Card -->
+                <div class="card">
+                    <div class="card-body text-center">
+                        <i class="fas fa-gamepad icon"></i>
+                        <h5 class="card-title">Play Games to Enhance IQ</h5>
+                        <p class="card-text">Boost your IQ by playing interactive games.</p>
+                        <a href="{{ url_for('GAME') }}" class="btn-custom">Play Now</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <p>© 2024 Hybrid Learning Platform. All rights reserved.</p>
+    </footer>
+    <!-- Notification Bell -->
+    <div class="notification-bell" id="notificationBell">
+        <i class="fas fa-bell"></i>
+    </div>
+    <!-- Sidebar Toggle JS -->
+    <script>
+        // Get the icon element
+        const todoIcon = document.querySelector('.todo-icon');
+    
+        // Variables to store the initial position of the mouse
+        let offsetX, offsetY;
+    
+        // Add mouse down event to start dragging
+        todoIcon.addEventListener('mousedown', (e) => {
+            // Calculate the mouse offset from the top-left corner of the icon
+            offsetX = e.clientX - todoIcon.getBoundingClientRect().left;
+            offsetY = e.clientY - todoIcon.getBoundingClientRect().top;
+    
+            // Change cursor to indicate dragging
+            todoIcon.style.cursor = 'grabbing';
+    
+            // Add mousemove event to handle dragging
+            document.addEventListener('mousemove', moveIcon);
+            
+            // Add mouseup event to stop dragging
+            document.addEventListener('mouseup', stopDrag);
+        });
+    
+        // Function to move the icon
+        function moveIcon(e) {
+    // Get the viewport width and height
+    const viewportWidth = window.innerWidth;
+    const viewportHeight = window.innerHeight;
+
+    // Get the icon's width and height
+    const iconWidth = todoIcon.offsetWidth;
+    const iconHeight = todoIcon.offsetHeight;
+
+    // Calculate new position, ensuring it stays within the screen bounds
+    let newX = e.clientX - offsetX;
+    let newY = e.clientY - offsetY;
+
+    // Constrain the icon within the screen's width and height
+    if (newX < 0) newX = 0;
+    if (newX + iconWidth > viewportWidth) newX = viewportWidth - iconWidth;
+    if (newY < 0) newY = 0;
+    if (newY + iconHeight > viewportHeight) newY = viewportHeight - iconHeight;
+
+    // Update icon's position
+    todoIcon.style.left = `${newX}px`;
+    todoIcon.style.top = `${newY}px`;
+}
+
+    
+        // Function to stop dragging
+        function stopDrag() {
+            // Remove mousemove and mouseup event listeners when drag ends
+            document.removeEventListener('mousemove', moveIcon);
+            document.removeEventListener('mouseup', stopDrag);
+    
+            // Reset cursor to grab when not dragging
+            todoIcon.style.cursor = 'grab';
+        }
+    </script>
+    
+    
+    <script>
+        const sidebarToggle = document.getElementById('sidebarToggle');
+        const sidebar = document.getElementById('sidebar');
+
+        sidebarToggle.addEventListener('click', function() {
+            sidebar.classList.toggle('open');
+        });
+
+        // Close sidebar if clicked outside
+        document.addEventListener('click', function(e) {
+            if (!sidebar.contains(e.target) && !sidebarToggle.contains(e.target)) {
+                sidebar.classList.remove('open');
+            }
+        });
+    </script>
+
+    <!-- Notifications List -->
+    <div class="notifications-list" id="notificationsList"></div> <!-- Added notifications list -->
+
+    <script>
+        // Establish Socket.IO connection
+        const socket = io.connect();
+    
+        // Toggle the notifications list visibility
+        const notificationBell = document.getElementById('notificationBell');
+        const notificationsList = document.getElementById('notificationsList');
+    
+        notificationBell.addEventListener('click', function() {
+            notificationsList.classList.toggle('active');
+        });
+    
+        // Fetch notifications from the backend on page load
+        async function fetchNotifications() {
+            const response = await fetch('/notifications');
+            const notifications = await response.json();
+            displayNotifications(notifications);
+        }
+    
+        // Display notifications in the list
+        function displayNotifications(notifications) {
+            notificationsList.innerHTML = ''; // Clear the current notifications
+            notifications.forEach(notification => {
+                const notificationElement = document.createElement('div');
+                notificationElement.classList.add('notification-item');
+                notificationElement.textContent = notification;
+                notificationsList.appendChild(notificationElement);
+            });
+        }
+    
+        // Listen for new notifications from the server via Socket.IO
+        socket.on('new_notification', function(notification) {
+            const notificationElement = document.createElement('div');
+            notificationElement.classList.add('notification-item');
+            notificationElement.textContent = notification.message;  // Display new notification message
+            notificationsList.appendChild(notificationElement);
+    
+            // Optionally, you can add a visual cue on the bell (like a red dot).
+            notificationBell.style.backgroundColor = '#f44336'; // Red color on notification
+        });
+    
+        // Call fetchNotifications() on page load to load existing notifications
+        fetchNotifications();
+    </script>
+    
+    
+<script src="https://cdn.socket.io/4.0.1/socket.io.min.js"></script>
+</body>
+</html>

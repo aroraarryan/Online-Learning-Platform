@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Animated Trivia Quiz</title>
+    <style>
+        /* General Styles */
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background: url('https://img.freepik.com/premium-vector/questing-background_23-2148159240.jpg?semt=ais_hybrid') no-repeat center center fixed;
+            background-size: cover;
+            color: #fff;
+            text-align: center;
+            overflow-x: hidden;
+        }
+
+        h1 {
+            font-size: 3rem;
+            color: #7d52cc;
+            text-shadow: 3px 3px 8px rgba(0, 0, 0, 0.6);
+            margin-top: 20px;
+            animation: fadeInDown 1s ease-in-out;
+        }
+
+        #logo {
+            width: 100px;
+            margin: 20px auto;
+            animation: rotateLogo 4s linear infinite;
+        }
+
+        #quiz-container {
+            max-width: 600px;
+            margin: 20px auto;
+            padding: 30px;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 15px;
+            box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.4);
+            animation: slideInUp 1s ease;
+        }
+
+        #question {
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+            color: #333;
+            animation: slideInLeft 1s ease;
+        }
+
+        #choices {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        #choices button {
+            padding: 15px;
+            font-size: 1rem;
+            font-weight: bold;
+            background: linear-gradient(135deg, #6a11cb, #2575fc);
+            color: white;
+            border: none;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.4s ease;
+            box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        #choices button:hover {
+            transform: translateY(-5px) scale(1.05);
+            background: linear-gradient(135deg, #ff9a9e, #fad0c4);
+            box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.5);
+        }
+
+        #choices button.correct {
+            background: linear-gradient(135deg, #00c851, #007e33);
+            color: white;
+            box-shadow: 0px 8px 16px rgba(0, 255, 0, 0.3);
+        }
+
+        #choices button.incorrect {
+            background: linear-gradient(135deg, #ff4444, #cc0000);
+            color: white;
+            box-shadow: 0px 8px 16px rgba(255, 0, 0, 0.3);
+        }
+
+        #timer {
+            font-size: 1.5rem;
+            margin: 15px 0;
+            color: #333;
+            font-weight: bold;
+            animation: fadeIn 1.5s ease;
+        }
+
+        #next-question {
+            display: none;
+            margin-top: 20px;
+            padding: 10px 20px;
+            font-size: 1rem;
+            background: linear-gradient(135deg, #ff9a9e, #fad0c4);
+            color: #333;
+            font-weight: bold;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.4s ease;
+            box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.4);
+        }
+
+        #next-question:hover {
+            transform: translateY(-3px);
+            background: linear-gradient(135deg, #fbc2eb, #a6c1ee);
+            box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.5);
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideInLeft {
+            from {
+                opacity: 0;
+                transform: translateX(-50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes slideInUp {
+            from {
+                opacity: 0;
+                transform: translateY(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes rotateLogo {
+            from {
+                transform: rotate(0deg);
+            }
+            to {
+                transform: rotate(360deg);
+            }
+        }
+    </style>
+</head>
+<body>
+    <img id="logo" src="https://www.shutterstock.com/shutterstock/photos/2519283837/display_1500/stock-vector-quiz-time-text-effect-font-editable-typography-d-text-quiz-time-label-with-question-mark-quiz-2519283837.jpg" alt="Quiz Logo">
+
+    <div id="quiz-container">
+        <h1>Trivia Quiz</h1>
+        <div id="question"></div>
+        <div id="choices"></div>
+        <div id="timer">Time: <span id="time-left">30</span>s</div>
+        <button id="next-question">Next Question</button>
+    </div>
+
+    <script>
+        const API_URL = "https://opentdb.com/api.php?amount=5&type=multiple";
+
+        let currentQuestionIndex = 0;
+        let timer;
+        let questions = [];
+
+        function startTimer() {
+            let timeLeft = 30;
+            document.getElementById('time-left').textContent = timeLeft;
+            timer = setInterval(() => {
+                timeLeft--;
+                document.getElementById('time-left').textContent = timeLeft;
+                if (timeLeft <= 0) {
+                    clearInterval(timer);
+                    nextQuestion();
+                }
+            }, 1000);
+        }
+
+        function loadQuestion() {
+            const question = questions[currentQuestionIndex];
+            document.getElementById('question').textContent = decodeHTML(question.question);
+            const choicesElement = document.getElementById('choices');
+            choicesElement.innerHTML = '';
+
+            const shuffledChoices = [...question.incorrect_answers, question.correct_answer]
+                .sort(() => Math.random() - 0.5);
+
+            shuffledChoices.forEach(choice => {
+                const choiceButton = document.createElement('button');
+                choiceButton.textContent = decodeHTML(choice);
+                choiceButton.onclick = () => submitAnswer(choiceButton, choice);
+                choicesElement.appendChild(choiceButton);
+            });
+        }
+
+        function submitAnswer(button, answer) {
+            const correctAnswer = questions[currentQuestionIndex].correct_answer;
+
+            if (answer === correctAnswer) {
+                button.classList.add('correct');
+            } else {
+                button.classList.add('incorrect');
+            }
+
+            document.getElementById('next-question').style.display = 'block';
+        }
+
+        function nextQuestion() {
+            clearInterval(timer);
+            currentQuestionIndex++;
+            if (currentQuestionIndex < questions.length) {
+                document.getElementById('next-question').style.display = 'none';
+                loadQuestion();
+                startTimer();
+            } else {
+                alert('Quiz Finished! Thanks for playing.');
+                if (confirm('Would you like to restart the quiz?')) {
+                    restartQuiz();
+                }
+            }
+        }
+
+        function restartQuiz() {
+            currentQuestionIndex = 0;
+            document.getElementById('next-question').style.display = 'none';
+            fetchQuestions();
+        }
+
+        function fetchQuestions() {
+            fetch(API_URL)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.results.length === 0) {
+                        alert('No questions found! Please try again later.');
+                        return;
+                    }
+                    questions = data.results;
+                    currentQuestionIndex = 0;
+                    loadQuestion();
+                    startTimer();
+                })
+                .catch(error => {
+                    console.error('Error fetching questions:', error);
+                    alert('Failed to load questions. Please check your internet connection and try again.');
+                });
+        }
+
+        function decodeHTML(html) {
+            const textArea = document.createElement('textarea');
+            textArea.innerHTML = html;
+            return textArea.value;
+        }
+
+        document.getElementById('next-question').onclick = nextQuestion;
+
+        // Fetch and load questions on page load
+        fetchQuestions();
+    </script>
+</body>
+</html>

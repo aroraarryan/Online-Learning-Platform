@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Word Scramble Game</title>
+    <style>
+        /* General Styles */
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+            background: url('https://th.bing.com/th/id/OIP.QexO691COk3AGdfIGJe5NwHaEo?rs=1&pid=ImgDetMain') no-repeat center center fixed;
+            background-size: cover;
+        }
+
+        .game-container {
+            background-color: rgba(255, 255, 255, 0.9); /* semi-transparent background */
+            border-radius: 12px;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
+            padding: 15px;
+            text-align: center;
+            width: 100%;
+            max-width: 320px; /* Reduce the max width to 320px */
+            transition: transform 0.3s ease-in-out;
+            box-sizing: border-box;
+        }
+
+        .game-container:hover {
+            transform: scale(1.05);
+        }
+
+        h1 {
+            color: #ff6600;
+            font-size: 24px;
+            margin-bottom: 10px;
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        .score, .round, .timer {
+            font-size: 14px;
+            font-weight: bold;
+            margin: 8px 0;
+        }
+
+        .scrambled-word {
+            font-size: 24px;
+            font-weight: bold;
+            color: #333;
+            letter-spacing: 2px;
+            margin-bottom: 12px;
+            animation: fadeIn 1s ease-in-out;
+        }
+
+        .message {
+            font-size: 12px;
+            margin-top: 15px;
+            color: #444;
+        }
+
+        .hint {
+            color: #0077cc;
+            font-size: 12px;
+            margin-top: 8px;
+            cursor: pointer;
+        }
+
+        input[type="text"] {
+            padding: 8px;
+            width: 75%;
+            font-size: 14px;
+            border-radius: 5px;
+            border: 2px solid #ccc;
+            margin-bottom: 12px;
+            transition: border 0.3s ease;
+            box-sizing: border-box;
+        }
+
+        input[type="text"]:focus {
+            border-color: #0077cc;
+            outline: none;
+        }
+
+        button {
+            padding: 8px 15px;
+            background-color: #ff6600;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 12px;
+            margin-right: 8px;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #ff944d;
+        }
+
+        .btn-container {
+            margin-top: 12px;
+        }
+
+        .timer {
+            font-size: 18px;
+            font-weight: bold;
+            color: #d94e5f;
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            0% {
+                opacity: 0;
+            }
+            100% {
+                opacity: 1;
+            }
+        }
+
+        @keyframes shake {
+            0% {
+                transform: translateX(-8px);
+            }
+            25% {
+                transform: translateX(8px);
+            }
+            50% {
+                transform: translateX(-8px);
+            }
+            75% {
+                transform: translateX(8px);
+            }
+            100% {
+                transform: translateX(0);
+            }
+        }
+
+        /* Logo */
+        .logo {
+            width: 60px;
+            height: auto;
+            margin-bottom: 12px;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 480px) {
+            h1 {
+                font-size: 22px;
+            }
+
+            .score, .round, .timer {
+                font-size: 12px;
+            }
+
+            .scrambled-word {
+                font-size: 20px;
+            }
+
+            input[type="text"] {
+                width: 70%;
+                font-size: 12px;
+            }
+
+            button {
+                font-size: 10px;
+                padding: 6px 12px;
+            }
+
+            .timer {
+                font-size: 16px;
+            }
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="game-container">
+        <img src="https://th.bing.com/th/id/OIP.A2luelC6KryOpCFjoYTlEgAAAA?w=474&h=763&rs=1&pid=ImgDetMain" alt="Game Logo" class="logo">
+        <h1>Word Scramble Game</h1>
+        <p class="round" id="round">Round: 1</p>
+        <p class="score">Score: <span id="score">0</span></p>
+        <p class="timer">Time Left: <span id="time-left">30</span>s</p>
+
+        <div class="scrambled-word" id="scrambled-word"></div>
+
+        <input type="text" id="guess" placeholder="Enter your guess" />
+        
+        <div class="message" id="message"></div>
+
+        <div class="btn-container">
+            <button onclick="checkGuess()">Submit</button>
+            <button onclick="giveHint()">Give Hint</button>
+        </div>
+
+        <div class="hint" id="hint"></div>
+        
+        <button id="restart" style="display: none;" onclick="restartGame()">Restart Game</button>
+    </div>
+
+    <script>
+        let score = 0;
+        let currentWord = '';
+        let scrambledWord = '';
+        let round = 1;
+        let maxRounds = 5;
+        let timer = 30; // 30 seconds per round
+        let timerInterval;
+        let wordList = [
+            "abacus", "ability", "absence", "academy", "account", "accuse", "achieve", "acquire", "address", "advance",
+            "airport", "alcohol", "allege", "ancient", "appeal", "approve", "arrive", "athlete", "balance", "biscuit",
+            "biology", "bottle", "bravery", "cabbage", "camera", "candle", "capture", "chicken", "circle", "courage",
+            "creator", "dancing", "decent", "decide", "deposit", "disease", "drummer", "dynamic", "eagerly", "elapse",
+            "examine", "exceed", "family", "flavor", "forest", "forget", "gadget", "garden", "gather", "guitar",
+            "health", "horror", "income", "inspect", "jacket", "jungle", "laptop", "leader", "legacy", "letters",
+            "lifestyle", "magnet", "manual", "martial", "master", "monkey", "moral", "nature", "neuron", "notice",
+            "opinion", "oxygen", "pardon", "people", "piano", "pocket", "pollute", "purpose", "quaint", "quality",
+            "radius", "recess", "remind", "ripple", "separate", "silent", "soccer", "suffer", "survival", "tackle",
+            "tangle", "teacher", "tiger", "traffic", "urgent", "utility", "venture", "vibrant", "violence", "winner",
+            "wonder", "yacht", "yellow", "zebra", "ability", "agency", "believe", "briefly", "button", "camera",
+            "cherry", "coyote", "crystal", "danger", "dense", "doubt", "element", "endure", "eternal", "famous",
+            "fetch", "float", "flock", "genuine", "guitar", "hasty", "hurricane", "innocent", "jungle", "jumble",
+            "keynote", "lifestyle", "lone", "magical", "maturity", "monster", "noble", "notion", "ocean", "obtain",
+            "perceive", "pencil", "prison", "project", "resolve", "return", "sane", "series", "simplify", "sneak",
+            "strive", "sunset", "theory", "trace", "trick", "unique", "unity", "village", "vocal", "weight",
+            "wonder", "yearly", "zoom", "carpet", "legends"
+        ];
+
+        function getRandomWord() {
+            return wordList[Math.floor(Math.random() * wordList.length)];
+        }
+
+        function scrambleWord(word) {
+            let scrambled = word.split('');
+            for (let i = scrambled.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [scrambled[i], scrambled[j]] = [scrambled[j], scrambled[i]];
+            }
+            return scrambled.join('');
+        }
+
+        function displayScrambledWord() {
+            currentWord = getRandomWord();
+            scrambledWord = scrambleWord(currentWord);
+            document.getElementById('scrambled-word').textContent = scrambledWord;
+            document.getElementById('message').textContent = '';
+            document.getElementById('guess').value = '';
+            document.getElementById('round').textContent = `Round: ${round}`;
+            document.getElementById('time-left').textContent = timer;
+
+            // Start the timer countdown
+            clearInterval(timerInterval);
+            timer = 30;
+            timerInterval = setInterval(updateTimer, 1000);
+        }
+
+        function updateTimer() {
+            timer--;
+            document.getElementById('time-left').textContent = timer;
+            if (timer <= 0) {
+                clearInterval(timerInterval);
+                document.getElementById('message').textContent = 'Time is up! Try the next word.';
+                document.getElementById('message').style.color = 'red';
+                setTimeout(nextRound, 1000);
+            }
+        }
+
+        function checkGuess() {
+            const guess = document.getElementById('guess').value.toLowerCase();
+            if (guess === currentWord) {
+                score++;
+                document.getElementById('message').textContent = 'Correct! Well done!';
+                document.getElementById('message').style.color = 'green';
+                document.getElementById('message').style.animation = 'shake 0.5s ease';
+                document.getElementById('message').style.animationIterationCount = '1';
+            } else {
+                document.getElementById('message').textContent = 'Try again!';
+                document.getElementById('message').style.color = 'red';
+                document.getElementById('message').style.animation = 'shake 0.5s ease';
+                document.getElementById('message').style.animationIterationCount = '1';
+            }
+            document.getElementById('score').textContent = score;
+            setTimeout(nextRound, 1000);
+        }
+
+        function giveHint() {
+            const hint = `The first letter is: ${currentWord[0].toUpperCase()}`;
+            document.getElementById('message').textContent = hint;
+            document.getElementById('message').style.color = 'blue';
+        }
+
+        function nextRound() {
+            round++;
+            if (round > maxRounds) {
+                clearInterval(timerInterval);
+                document.getElementById('message').textContent = 'Game Over! You finished the game.';
+                document.getElementById('message').style.color = 'red';
+                document.getElementById('restart').style.display = 'block';
+            } else {
+                displayScrambledWord();
+            }
+        }
+
+        function restartGame() {
+            round = 1;
+            score = 0;
+            document.getElementById('score').textContent = score;
+            document.getElementById('restart').style.display = 'none';
+            displayScrambledWord();
+        }
+
+        // Start the game by displaying the first scrambled word
+        displayScrambledWord();
+    </script>
+
+</body>
+</html>

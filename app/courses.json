@@ -1,0 +1,30 @@
+[
+    {
+        "course_id": 1,
+        "title": "Data Science Basics",
+        "instructor": "Edureka",
+        "duration": "10 weeks",
+        "youtube_link": "https://youtu.be/-ETQ97mXXF0?si=SudG3o9JKN1hQzxW"
+    },
+    {
+        "course_id": 2,
+        "title": "Introduction to Python",
+        "instructor": "Harry",
+        "duration": "6 weeks",
+        "youtube_link": "https://www.youtube.com/watch?v=rfscVS0vtbw"
+    },
+    {
+        "course_id": 3,
+        "title": "Graphic Design Fundamentals",
+        "instructor": "Striever",
+        "duration": "8 weeks",
+        "youtube_link": "https://youtu.be/e_dv7GBHka8?si=5SxIUD_iaiiPP5oE"
+    },
+    {
+        "course_id": 4,
+        "title": "Web Development Bootcamp",
+        "instructor": "Michael Brown",
+        "duration": "12 weeks",
+        "youtube_link": "https://www.youtube.com/watch?v=3JluqTojuME"
+    }
+]

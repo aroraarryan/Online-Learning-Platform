@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Get Started</title>
+    <style>
+        /* Overall page styling */
+        body {
+            font-family: 'Poppins', sans-serif;
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-image: url('https://www.janets.org.uk/wp-content/uploads/2024/08/What-is-the-Average-IQ-Score-in-the-UK-Everything-you-need-to-know-in-2024.jpg');
+            background-size: cover;
+            background-position: center;
+            color: white;
+            text-align: center;
+            overflow: hidden;
+        }
+
+        /* Centered container with transparency */
+        .container {
+            max-width: 600px;
+            width: 100%;
+            padding: 30px;
+            background-color: rgba(0, 0, 0, 0.6);
+            border-radius: 15px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.7);
+        }
+
+        h2 {
+            font-size: 2.8em;
+            margin-bottom: 20px;
+            font-weight: bold;
+            color: #ff4a4a;
+            text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.4);
+        }
+
+        p {
+            font-size: 1.2em;
+            margin-bottom: 40px;
+            color: #e1e1e1;
+        }
+
+        .btn {
+            display: block;
+            padding: 15px 30px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 30px;
+            text-align: center;
+            font-size: 1.3em;
+            text-decoration: none;
+            margin-bottom: 20px;
+            transition: transform 0.3s ease, background-color 0.3s ease, box-shadow 0.3s ease;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.4);
+            position: relative;
+        }
+
+        .btn:hover {
+            background-color: #45a049;
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+        }
+
+        /* Floating Home Icon Styling */
+        .home-icon {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #4CAF50, #2a82ba);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.5em;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            z-index: 1000;
+        }
+
+        .home-icon:hover {
+            transform: scale(1.2);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+        }
+
+        /* Media query for smaller screens */
+        @media (max-width: 768px) {
+            h2 {
+                font-size: 2.3em;
+            }
+
+            .btn {
+                font-size: 1.2em;
+            }
+
+            .home-icon {
+                width: 45px;
+                height: 45px;
+                font-size: 1.3em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Home Icon -->
+    <a href="/" class="home-icon" title="Go to Home">
+        <i>&#8962;</i> <!-- Unicode for home symbol -->
+    </a>
+
+    <div class="container">
+        <h2>Get Started with Hybrid Learning Platform</h2>
+        <p>Select your role below to proceed:</p>
+
+        <!-- Section for Student Login -->
+        <a href="{{ url_for('login') }}" class="btn">Login as Student</a>
+
+        <!-- Section for Instructor Login -->
+        <a href="{{ url_for('instructor_login') }}" class="btn">Login as Instructor</a>
+
+        <!-- Section for New User Registration -->
+        <a href="{{ url_for('new_user') }}" class="btn">New User - Sign Up</a>
+    </div>
+</body>
+</html>
